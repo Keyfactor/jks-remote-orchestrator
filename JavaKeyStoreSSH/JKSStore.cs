@@ -12,6 +12,7 @@ using System.Text;
 using Newtonsoft.Json;
 
 using JavaKeyStoreSSH.RemoteHandlers;
+using Keyfactor.Extensions.Pam.Utilities;
 
 namespace JavaKeyStoreSSH
 {
@@ -67,7 +68,7 @@ namespace JavaKeyStoreSSH
         internal void Initialize(string extensions)
         {
             if (ServerType == ServerTypeEnum.Linux)
-                SSH = new SSHHandler(Server, ServerId, ServerPassword);
+                SSH = new SSHHandler(Server, ServerId, PamUtility.ResolvePassword(ServerPassword));
             else
                 SSH = new WinRMHandler(Server);
 
