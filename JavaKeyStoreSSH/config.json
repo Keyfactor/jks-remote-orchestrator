@@ -1,0 +1,9 @@
+{
+  "UseSudo": "N",
+  "UsePreRunScript": "N",
+  "PreRunScript": "ScriptName.sh",
+  "PreRunScriptDestinationPath": "/path/to/script/",
+  "UseSeparateUploadFilePath": "N",
+  "SeparateUploadFilePath": "/path/to/upload/folder/",
+  "FindKeytoolPathOnWindows":  "N"
+}
