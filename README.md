@@ -113,7 +113,7 @@ If you choose to manually create a JavaKeystore store In Keyfactor Command rathe
   
 - **Store Path** – Required. The FULL PATH and file name of the Java Keystore being managed. File paths on Linux servers will always begin with a &quot;/&quot;. Windows servers will always begin with the drive letter, colon, and backslash, such as &quot;c:\&quot;.
 - **Orchestrator** – Select the orchestrator you wish to use to manage this store
-- **Store Password** – Set the store password or set no password after clicking the supplied button
+- **Store Password** – Set the store password for the Java Keystore
 - **Inventory Schedule** – Set a schedule for running Inventory jobs or none, if you choose not to schedule Inventory at this time.
 
 **3b. (Optional) Schedule a JavaKeystore Discovery Job**
