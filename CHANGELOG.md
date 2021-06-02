@@ -1,3 +1,6 @@
+v1.1.0
+- Add local PAM capability for resolving the server password
+
 v1.0.10
 - Added optional Management Custom Job Field - entryPassword - Allows for a separate key password from the store password.  If not supplied, they key password will be set as the store password
 
