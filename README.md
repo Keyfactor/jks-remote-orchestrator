@@ -58,7 +58,7 @@ In Keyfactor Command create a new Certificate Store Type similar to the one belo
 - **Store PathType** – Freeform (user will enter the the location of the store)
 - **Private Keys** – Optional (a certificate in a Java Keystore may or may not contain a private key)
 - **PFX Password Style** – Default
-- **Job Types** – Discovery, Inventory, Add, and Remove are the 3 job types implemented by this AnyAgent
+- **Job Types** – Discovery, Inventory, Add, Remove, and Create are the 4 job types implemented by this AnyAgent
 - **Management Job Custom Fields** - Set to "entryPassword".  This will allow users when enrolling a new certificate with certificate store delivery or adding an existing certificate to a store to specify a separate password from the certificate store password to be used as the key password for that entry.  If this field is left blank when adding a certificate to a store, the store password will be used for the key password.  You can optionally omit setting this field up on the Certificate Store Type set up screen.  In this case the key password will ALWAYS be set to the store password.
 
 **2. Register the JavaKeystore AnyAgent with Keyfactor**
@@ -113,7 +113,7 @@ If you choose to manually create a JavaKeystore store In Keyfactor Command rathe
   
 - **Store Path** – Required. The FULL PATH and file name of the Java Keystore being managed. File paths on Linux servers will always begin with a &quot;/&quot;. Windows servers will always begin with the drive letter, colon, and backslash, such as &quot;c:\&quot;.
 - **Orchestrator** – Select the orchestrator you wish to use to manage this store
-- **Store Password** – Set the store password or set no password after clicking the supplied button
+- **Store Password** – Set the store password for the Java Keystore
 - **Inventory Schedule** – Set a schedule for running Inventory jobs or none, if you choose not to schedule Inventory at this time.
 
 **3b. (Optional) Schedule a JavaKeystore Discovery Job**
