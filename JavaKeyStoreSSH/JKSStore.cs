@@ -9,9 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Newtonsoft.Json;
 
 using JavaKeyStoreSSH.RemoteHandlers;
+using Keyfactor.Extensions.Pam.Utilities;
 
 namespace JavaKeyStoreSSH
 {
@@ -24,6 +26,8 @@ namespace JavaKeyStoreSSH
         const string END_DELIM = "-----END CERTIFICATE-----";
         const string ALIAS_DELIM = "Alias name: ";
         const string FILE_NAME_REPL = "||FILE_NAME_HERE||";
+
+        static Mutex mutex = new Mutex(false, "ModifyStore");
 
         internal enum ServerTypeEnum
         {
@@ -67,7 +71,7 @@ namespace JavaKeyStoreSSH
         internal void Initialize(string extensions)
         {
             if (ServerType == ServerTypeEnum.Linux)
-                SSH = new SSHHandler(Server, ServerId, ServerPassword);
+                SSH = new SSHHandler(Server, ServerId, PamUtility.ResolvePassword(ServerPassword));
             else
                 SSH = new WinRMHandler(Server);
 
@@ -207,11 +211,16 @@ namespace JavaKeyStoreSSH
             
             try
             {
+                mutex.WaitOne();
                 string result = SSH.RunCommand(keyToolCommand, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, StorePassword == null ? null : new string[] { StorePassword });
             }
             catch (Exception ex)
             {
                 throw new JKSException($"Error attempting to remove certficate for store path={StorePath}, file name={StoreFileName}.", ex);
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
             }
         }
 
@@ -326,6 +335,8 @@ namespace JavaKeyStoreSSH
                 }
 
                 SSH.UploadCertificateFile(UploadFilePath, $"{fileName}{fileSuffix}", certBytes);
+
+                mutex.WaitOne();
                 SSH.RunCommand(command, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, StorePassword == null ? null : new string[] { StorePassword });
             }
             catch (Exception ex)
@@ -339,6 +350,10 @@ namespace JavaKeyStoreSSH
                     SSH.RemoveCertificateFile(StorePath, $"{fileName}{fileSuffix}");
                 }
                 catch (Exception) { }
+                finally
+                {
+                    mutex.ReleaseMutex();
+                }
             }
         }
 
