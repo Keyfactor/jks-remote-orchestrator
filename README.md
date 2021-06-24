@@ -1,9 +1,11 @@
-## Overview
+# Remote JKS
+## orchestrator
 
-The JavaKeystore AnyAgent allows a user to discover, inventory, and manage (both add and remove) Java Keystore certificate stores on both Windows and Linux servers.
+The remote JKS Orchestrator allows for the remote management of Java Key Stores. Discovery, Inventory, and Management functions are supported. The orchestrator performs operations by issuing remote commands over SSH to Linux based systems and WinRM to Windows based systems.
 
-The prerequisite for using the JavaKeystore AnyAgent to manage/orchestrate a Linux or Windows server is that Java be installed on each server being managed/orchestrated.
+<!-- add integration specific information below -->
 
+Note that as a prerequisite for using the Remote JKS to manage/orchestrate a Linux or Windows server is that Java be installed on each server being managed/orchestrated.
 
 ## Use Cases
 
