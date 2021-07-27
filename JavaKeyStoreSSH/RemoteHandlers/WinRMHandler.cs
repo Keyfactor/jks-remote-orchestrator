@@ -124,7 +124,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
             string scriptBlock = $@"
                                     param($contents)
                                 
-                                    Set-Content {path + fileName} -Encoding Byte -Value $contents
+                                    Set-Content '{path + fileName}' -Encoding Byte -Value $contents
                                 ";
 
             object[] arguments = new object[] { certBytes };

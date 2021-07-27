@@ -326,6 +326,7 @@ namespace JavaKeyStoreSSH
 
             try
             {
+                mutex.WaitOne();
                 if (DoesCertificateAliasExist(alias))
                 {
                     if (overwrite)
@@ -336,7 +337,6 @@ namespace JavaKeyStoreSSH
 
                 SSH.UploadCertificateFile(UploadFilePath, $"{fileName}{fileSuffix}", certBytes);
 
-                mutex.WaitOne();
                 SSH.RunCommand(command, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, StorePassword == null ? null : new string[] { StorePassword });
             }
             catch (Exception ex)
