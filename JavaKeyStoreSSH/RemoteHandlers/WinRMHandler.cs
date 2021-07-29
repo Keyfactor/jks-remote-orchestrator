@@ -139,6 +139,16 @@ namespace JavaKeyStoreSSH.RemoteHandlers
             RunCommand($"rm {path}{fileName}", null, false, null);
         }
 
+        public override bool DoesStoreExist(string path, string fileName)
+        {
+            Logger.Debug($"DoesStoreExist: {path} {fileName}");
+
+            string NOT_EXISTS = "file not found";
+            string result = RunCommand($"dir {path}{fileName}", null, false, null);
+
+            return !result.ToLower().Contains(NOT_EXISTS);
+        }
+
         private string FormatResult(ICollection<PSObject> results)
         {
             StringBuilder rtn = new StringBuilder();

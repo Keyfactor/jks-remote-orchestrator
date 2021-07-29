@@ -53,6 +53,9 @@ namespace JavaKeyStoreSSH
                 switch (config.Job.OperationType)
                 {
                     case AnyJobOperationType.Add:
+                        if (!jksStore.DoesStoreExist())
+                            throw new JKSException($"Java Keystore {jksStore.StorePath}{jksStore.StoreFileName} cannot be found.");
+
                         byte[] certBytes = Convert.FromBase64String(config.Job.EntryContents);
                         MemoryStream stream = new MemoryStream(certBytes);
                         Pkcs12Store store;
@@ -70,6 +73,9 @@ namespace JavaKeyStoreSSH
                         break;
 
                     case AnyJobOperationType.Remove:
+                        if (!jksStore.DoesStoreExist())
+                            throw new JKSException($"Java Keystore {jksStore.StorePath}{jksStore.StoreFileName} cannot be found.");
+
                         jksStore.DeleteCertificateByAlias(config.Job.Alias);
 
                         break;

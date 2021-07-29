@@ -77,7 +77,7 @@ namespace JavaKeyStoreSSH
 
             SSH.Initialize();
 
-            if (!ApplicationSettings.UsePrerunScript && !IsJavaInstalled())
+            if (!ApplicationSettings.UsePrerunScript && !IsKeytoolInstalled())
                 throw new JKSException($"Java is either not installed on the server or is not in the $PATH environment variable for store path={StorePath}, file name={StoreFileName}.");
 
             if (ApplicationSettings.UsePrerunScript && ServerType == ServerTypeEnum.Linux)
@@ -144,6 +144,11 @@ namespace JavaKeyStoreSSH
         {
             if (SSH != null)
                 SSH.Terminate();
+        }
+
+        internal bool DoesStoreExist()
+        {
+            return SSH.DoesStoreExist(StorePath, StoreFileName);
         }
 
         internal bool IsValidStore(string path)
@@ -244,9 +249,9 @@ namespace JavaKeyStoreSSH
             AddEntry(keyToolCommand, destAlias, certBytes, pfxPassword, overwrite);
         }
 
-        private bool IsJavaInstalled()
+        private bool IsKeytoolInstalled()
         {
-            string keyToolCommand = ServerType == ServerTypeEnum.Linux ? $"which java" : "java -version 2>&1";
+            string keyToolCommand = ServerType == ServerTypeEnum.Linux ? $"which keytool" : "java -version 2>&1";
             string result = SSH.RunCommand(keyToolCommand, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, null);
             return !(string.IsNullOrEmpty(result));
         }
