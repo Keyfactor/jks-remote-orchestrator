@@ -75,7 +75,14 @@ namespace JavaKeyStoreSSH
             else
                 SSH = new WinRMHandler(Server);
 
-            SSH.Initialize();
+            try
+            {
+                SSH.Initialize();
+            }
+            catch (Exception ex)
+            {
+                throw new JKSException("Error attempting to connect to the remote server.", ex);
+            }
 
             if (!ApplicationSettings.UsePrerunScript && !IsKeytoolInstalled())
                 throw new JKSException($"Java is either not installed on the server or is not in the $PATH environment variable for store path={StorePath}, file name={StoreFileName}.");
@@ -87,7 +94,14 @@ namespace JavaKeyStoreSSH
 
                 try
                 {
-                    SSH.UploadCertificateFile(ApplicationSettings.PreRunScriptDestinationPath, cmdFileName, System.Text.Encoding.ASCII.GetBytes(ApplicationSettings.Script));
+                    try
+                    {
+                        SSH.UploadCertificateFile(ApplicationSettings.PreRunScriptDestinationPath, cmdFileName, System.Text.Encoding.ASCII.GetBytes(ApplicationSettings.Script));
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new JKSException("Error attempting to upload certificate file to the remote server. ", ex);
+                    }
                     SSH.RunCommand($"dos2unix {cmdFileAndPath}", null, ApplicationSettings.UseSudo, null);
                     SSH.RunCommand($"chmod +x {cmdFileAndPath}", null, ApplicationSettings.UseSudo, null);
 
@@ -340,9 +354,16 @@ namespace JavaKeyStoreSSH
                         throw new JKSException($"Alias already exists in certificate store.");
                 }
 
-                SSH.UploadCertificateFile(UploadFilePath, $"{fileName}{fileSuffix}", certBytes);
+                try
+                {
+                    SSH.UploadCertificateFile(UploadFilePath, $"{fileName}{fileSuffix}", certBytes);
+                }
+                catch (Exception ex)
+                {
+                    throw new JKSException("Error attempting to upload certificate file to the remote server. ", ex);
+                }
 
-                SSH.RunCommand(command, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, StorePassword == null ? null : new string[] { StorePassword });
+            SSH.RunCommand(command, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, StorePassword == null ? null : new string[] { StorePassword });
             }
             catch (Exception ex)
             {
