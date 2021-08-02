@@ -32,5 +32,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
         public abstract void UploadCertificateFile(string path, string fileName, byte[] certBytes);
 
         public abstract void RemoveCertificateFile(string path, string fileName);
+
+        public abstract bool DoesStoreExist(string path, string fileName);
     }
 }

@@ -74,8 +74,8 @@ namespace JavaKeyStoreSSH.RemoteHandlers
 
                     if (command.Result.ToLower().Contains(KEYTOOL_ERROR))
                         throw new ApplicationException(command.Result);
-
-                    return command.Result;
+                    
+                    return string.IsNullOrEmpty(command.Result) && !string.IsNullOrEmpty(command.Error) ? command.Error : command.Result;
                 }
             }
             catch (Exception ex)
@@ -127,6 +127,16 @@ namespace JavaKeyStoreSSH.RemoteHandlers
             Logger.Debug($"RemoveCertificateFile: {path} {fileName}");
 
             RunCommand($"rm {path}{fileName}", null, ApplicationSettings.UseSudo, null);
+        }
+
+        public override bool DoesStoreExist(string path, string fileName)
+        {
+            Logger.Debug($"DoesStoreExist: {path} {fileName}");
+
+            string NOT_EXISTS = "no such file or directory";
+            string result = RunCommand($"ls {path}{fileName}", null, ApplicationSettings.UseSudo, null);
+
+            return !result.ToLower().Contains(NOT_EXISTS);
         }
 
         private string ReplaceSpacesWithLF(string privateKey)
