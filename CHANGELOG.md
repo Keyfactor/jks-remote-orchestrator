@@ -1,9 +1,3 @@
-v1.2
-- Validate invalid store path
-- Move Mutex to beginning of try/catch block to avoid situation when it tries to release a lock that doesn't exist
-- Add quotes around set-content to allow for parentheses and other special characters in store path on Windows servers
-- Change command validating existence of "keytool.exe" on orchestrated sever from "which java" to "which keytool"
-
 v1.1.0
 - Add local PAM capability for resolving the server password
 - Fix race condition issue when concurrent jobs modify a single keystore by adding Mutex
