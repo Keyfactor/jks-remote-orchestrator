@@ -124,7 +124,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
             string scriptBlock = $@"
                                     param($contents)
                                 
-                                    Set-Content {path + fileName} -Encoding Byte -Value $contents
+                                    Set-Content '{path + fileName}' -Encoding Byte -Value $contents
                                 ";
 
             object[] arguments = new object[] { certBytes };
@@ -137,6 +137,16 @@ namespace JavaKeyStoreSSH.RemoteHandlers
             Logger.Debug($"RemoveCertificateFile: {path} {fileName}");
 
             RunCommand($"rm {path}{fileName}", null, false, null);
+        }
+
+        public override bool DoesStoreExist(string path, string fileName)
+        {
+            Logger.Debug($"DoesStoreExist: {path} {fileName}");
+
+            string NOT_EXISTS = "file not found";
+            string result = RunCommand($"dir {path}{fileName}", null, false, null);
+
+            return !result.ToLower().Contains(NOT_EXISTS);
         }
 
         private string FormatResult(ICollection<PSObject> results)

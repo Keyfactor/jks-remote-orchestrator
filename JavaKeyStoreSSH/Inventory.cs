@@ -49,6 +49,9 @@ namespace JavaKeyStoreSSH
 
                 jksStore.Initialize(string.Join(",", string.Empty));
 
+                if (!jksStore.DoesStoreExist())
+                    throw new JKSException($"Java Keystore {jksStore.StorePath}{jksStore.StoreFileName} cannot be found.");
+
                 List<string> aliases = jksStore.GetAllStoreAliases();
 
                 foreach (string alias in aliases)
