@@ -30,7 +30,13 @@ namespace JavaKeyStoreSSH.RemoteHandlers
         {
             try
             {
-                runspace = RunspaceFactory.CreateRunspace(new WSManConnectionInfo(new System.Uri($"{Server}/wsman")));
+                WSManConnectionInfo connectionInfo = new WSManConnectionInfo(new System.Uri($"{Server}/wsman"));
+                if (ApplicationSettings.UseNegotiateAuth)
+                {
+                    connectionInfo.AuthenticationMechanism = AuthenticationMechanism.Negotiate;
+                }
+                Logger.Trace($"WinRM Authentication Mechanism: {Enum.GetName(typeof(AuthenticationMechanism), connectionInfo.AuthenticationMechanism)}");
+                runspace = RunspaceFactory.CreateRunspace(connectionInfo);
                 runspace.Open();
             }
 
