@@ -187,6 +187,8 @@ Modify the six values as appropriate (all must be present regardless of Linux or
 
 **FindKeytoolPathOnWindows** (Windows only) – &quot;Y&quot; – The AnyAgent will search all available logical drives of the orchestrated server for the location of the "keytool.exe" program.  This path will be used for all subsequent "keytool" commands. &quot;N&quot; – The "keytool.exe" program is assumed to be in the system environment %PATH% variable.
 
+**UseNegotiateAuth** (Windows only) - &quot;Y&quot; – Will use Negotiate when connecting to windows servers via WinRM. &quot;N&quot; – Will use the default authentication mechanism.
+
 
 Json format that MUST be returned by script identified in **PreRunScript** if **UsePrerunScript** is set to &quot;Y&quot;:
 
