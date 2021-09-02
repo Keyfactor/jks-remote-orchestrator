@@ -41,9 +41,9 @@ namespace JavaKeyStoreSSH
 
             ValidateConfig(jsonContents);
 
-            UseSudo = jsonContents.UseSudo.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
+            UseSudo = jsonContents.UseSudo == null ? false : jsonContents.UseSudo.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
 
-            UsePrerunScript = jsonContents.UsePreRunScript.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
+            UsePrerunScript = jsonContents.UsePrerunScript == null ? false : jsonContents.UsePreRunScript.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
             PreRunScript = jsonContents.PreRunScript.Value;
             if (UsePrerunScript)
             {
@@ -53,11 +53,11 @@ namespace JavaKeyStoreSSH
                 }
             }
 
-            PreRunScriptDestinationPath = AddTrailingSlash(jsonContents.PreRunScriptDestinationPath.Value);
-            UseSeparateUploadFilePath = jsonContents.UseSeparateUploadFilePath.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
-            SeparateUploadFilePath = AddTrailingSlash(jsonContents.SeparateUploadFilePath.Value);
-            FindKeytoolPathOnWindows = jsonContents.FindKeytoolPathOnWindows.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
-            UseNegotiateAuth = jsonContents.UseNegotiateAuth.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
+            PreRunScriptDestinationPath = jsonContents.PreRunScriptDestinationPath == null ? string.Empty : AddTrailingSlash(jsonContents.PreRunScriptDestinationPath.Value);
+            UseSeparateUploadFilePath = jsonContents.UseSeparateUploadFilePath == null ? false : jsonContents.UseSeparateUploadFilePath.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
+            SeparateUploadFilePath = jsonContents.SeparateUploadFilePath == null ? string.Empty : AddTrailingSlash(jsonContents.SeparateUploadFilePath.Value);
+            FindKeytoolPathOnWindows = jsonContents.FindKeytoolPathOnWindows == null ? false : jsonContents.FindKeytoolPathOnWindows.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
+            UseNegotiateAuth = jsonContents.UseNegotiateAuth == null ? false : jsonContents.UseNegotiateAuth.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
         }
 
         private static string AddTrailingSlash(string path)
