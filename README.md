@@ -170,6 +170,7 @@ As a configuration step, you must modify the config.json file, found in the plug
 &quot;FindKeytoolPathOnWindows&quot;: &quot;N&quot;
 
 &quot;UseNegotiateAuth&quot;: &quot;N&quot;
+
 }
 
 Modify the six values as appropriate (all must be present regardless of Linux or Windows server orchestration):
