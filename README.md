@@ -169,6 +169,8 @@ As a configuration step, you must modify the config.json file, found in the plug
 
 &quot;FindKeytoolPathOnWindows&quot;: &quot;N&quot;
 
+&quot;UseNegotiateAuth&quot;: &quot;N&quot;
+
 }
 
 Modify the six values as appropriate (all must be present regardless of Linux or Windows server orchestration):
@@ -186,6 +188,8 @@ Modify the six values as appropriate (all must be present regardless of Linux or
 **SeparateUploadFilePath** (Linux only) – Only used when UseSeparateUploadFilePath is set to &quot;Y&quot;. Set this to the path you wish to use as the location to upload and later remove certificates to be added to the Java Keystore being maintained.
 
 **FindKeytoolPathOnWindows** (Windows only) – &quot;Y&quot; – The AnyAgent will search all available logical drives of the orchestrated server for the location of the "keytool.exe" program.  This path will be used for all subsequent "keytool" commands. &quot;N&quot; – The "keytool.exe" program is assumed to be in the system environment %PATH% variable.
+
+**UseNegotiateAuth** (Windows only) – Y/N - Determines if WinRM should use Negotiate (Y) when connecting to the remote server.
 
 
 Json format that MUST be returned by script identified in **PreRunScript** if **UsePrerunScript** is set to &quot;Y&quot;:

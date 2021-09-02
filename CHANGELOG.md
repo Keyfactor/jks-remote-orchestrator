@@ -1,3 +1,7 @@
+v1.3
+- Add config option to use Negotiate when connecting to Windows servers via WinRM
+- Updated Renci.SSH.Net reference
+
 v1.2
 - Validate invalid store path
 - Move Mutex to beginning of try/catch block to avoid situation when it tries to release a lock that doesn't exist
