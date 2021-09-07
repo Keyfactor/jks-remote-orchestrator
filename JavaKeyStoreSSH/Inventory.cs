@@ -10,39 +10,26 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-using Newtonsoft.Json.Linq;
+using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Common.Enums;
+using Keyfactor.Logging;
 
-using Keyfactor.Platform.Extensions.Agents;
-using Keyfactor.Platform.Extensions.Agents.Enums;
-using Keyfactor.Platform.Extensions.Agents.Delegates;
-using Keyfactor.Platform.Extensions.Agents.Interfaces;
-
-using CSS.Common.Logging;
-
-
-using Microsoft.Web.Administration;
+using Microsoft.Extensions.Logging;
 
 namespace JavaKeyStoreSSH
 {
-    public class Inventory : LoggingClientBase, IAgentJobExtension
+    public class Inventory : IInventoryJobExtension
     {
-        public string GetJobClass()
+        public string ExtensionName => "JKS-SSH";
+
+        public JobResult ProcessJob(InventoryJobConfiguration config, SubmitInventoryUpdate submitInventory)
         {
-            return "Inventory";
-        }
+            ILogger logger = LogHandler.GetClassLogger<Inventory>();
+            logger.LogDebug($"Begin Inventory...");
 
-        public string GetStoreType()
-        {
-            return "JKS-SSH";
-        }
+            JKSStore jksStore = new JKSStore(config.CertificateStoreDetails.ClientMachine, config.ServerUsername, config.ServerPassword, config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
 
-        public AnyJobCompleteInfo processJob(AnyJobConfigInfo config, SubmitInventoryUpdate submitInventory, SubmitEnrollmentRequest submitEnrollmentRequest, SubmitDiscoveryResults sdr)
-        {
-            Logger.Debug($"Begin Inventory...");
-
-            JKSStore jksStore = new JKSStore(config.Store.ClientMachine, config.Server.Username, config.Server.Password, config.Store.StorePath, config.Store.StorePassword);
-
-            List<AgentCertStoreInventoryItem> inventoryItems = new List<AgentCertStoreInventoryItem>();
+            List<CurrentInventoryItem> inventoryItems = new List<CurrentInventoryItem>();
             try
             {
                 ApplicationSettings.Initialize(this.GetType().Assembly.Location);
@@ -60,9 +47,9 @@ namespace JavaKeyStoreSSH
                     if (pemCertificates.Count == 0)
                         continue;
 
-                    inventoryItems.Add(new AgentCertStoreInventoryItem()
+                    inventoryItems.Add(new CurrentInventoryItem()
                     {
-                        ItemStatus = AgentInventoryItemStatus.Unknown,
+                        ItemStatus = OrchestratorInventoryItemStatus.Unknown,
                         Alias = alias,
                         PrivateKeyEntry = new X509Certificate2(Encoding.ASCII.GetBytes(pemCertificates[0])).HasPrivateKey,
                         UseChainLevel = pemCertificates.Count > 1,
@@ -72,7 +59,7 @@ namespace JavaKeyStoreSSH
             }
             catch (Exception ex)
             {
-                return new AnyJobCompleteInfo() { Status = 4, Message = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.Store.StorePath} on server {config.Store.ClientMachine}:") };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Success, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}:") };
             }
             finally
             {
@@ -82,11 +69,11 @@ namespace JavaKeyStoreSSH
             try
             {
                 submitInventory.Invoke(inventoryItems);
-                return new AnyJobCompleteInfo() { Status = 2, Message = "Successful" };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Success };
             }
             catch (Exception ex)
             {
-                return new AnyJobCompleteInfo() { Status = 4, Message = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.Store.StorePath} on server {config.Store.ClientMachine}:") };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure , FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}:") };
             }
         }
     }

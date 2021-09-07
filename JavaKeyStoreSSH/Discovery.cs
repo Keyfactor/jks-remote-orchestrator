@@ -11,9 +11,8 @@ using System.Linq;
 
 using Newtonsoft.Json;
 
-using Keyfactor.Platform.Extensions.Agents;
-using Keyfactor.Platform.Extensions.Agents.Delegates;
-using Keyfactor.Platform.Extensions.Agents.Interfaces;
+using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Common.Enums;
 
 using CSS.Common.Logging;
 
