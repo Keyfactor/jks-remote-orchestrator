@@ -11,6 +11,8 @@ using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Text;
 
+using Microsoft.Extensions.Logging;
+
 namespace JavaKeyStoreSSH.RemoteHandlers
 {
     class WinRMHandler : BaseRemoteHandler
@@ -35,14 +37,14 @@ namespace JavaKeyStoreSSH.RemoteHandlers
                 {
                     connectionInfo.AuthenticationMechanism = AuthenticationMechanism.Negotiate;
                 }
-                Logger.Trace($"WinRM Authentication Mechanism: {Enum.GetName(typeof(AuthenticationMechanism), connectionInfo.AuthenticationMechanism)}");
+                _logger.LogTrace($"WinRM Authentication Mechanism: {Enum.GetName(typeof(AuthenticationMechanism), connectionInfo.AuthenticationMechanism)}");
                 runspace = RunspaceFactory.CreateRunspace(connectionInfo);
                 runspace.Open();
             }
 
             catch (Exception ex)
             {
-                Logger.Debug($"Exception during Initialize...{ExceptionHandler.FlattenExceptionMessages(ex, ex.Message)}");
+                _logger.LogDebug($"Exception during Initialize...{ExceptionHandler.FlattenExceptionMessages(ex, ex.Message)}");
                 throw ex;
             }
         }
@@ -55,7 +57,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
 
         public override string RunCommand(string commandText, object[] parameters, bool withSudo, string[] passwordsToMaskInLog)
         {
-            Logger.Debug($"RunCommand: {Server}");
+            _logger.LogDebug($"RunCommand: {Server}");
 
             try
             {
@@ -83,7 +85,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
                             ps.AddArgument(parameter);
                     }
 
-                    Logger.Debug($"RunCommand: {displayCommand}");
+                    _logger.LogDebug($"RunCommand: {displayCommand}");
                     string result = FormatResult(ps.Invoke(parameters));
 
                     if (ps.HadErrors)
@@ -108,7 +110,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
                             throw new ApplicationException(errors);
                     }
                     else
-                        Logger.Debug($"WinRM Results: {displayCommand}::: {result}");
+                        _logger.LogDebug($"WinRM Results: {displayCommand}::: {result}");
 
                     if (result.ToLower().Contains(KEYTOOL_ERROR))
                         throw new ApplicationException(result);
@@ -118,14 +120,14 @@ namespace JavaKeyStoreSSH.RemoteHandlers
             }
             catch (Exception ex)
             {
-                Logger.Debug($"Exception during RunCommand...{ExceptionHandler.FlattenExceptionMessages(ex, ex.Message)}");
+                _logger.LogDebug($"Exception during RunCommand...{ExceptionHandler.FlattenExceptionMessages(ex, ex.Message)}");
                 throw ex;
             }
         }
 
         public override void UploadCertificateFile(string path, string fileName, byte[] certBytes)
         {
-            Logger.Debug($"UploadCertificateFile: {path} {fileName}");
+            _logger.LogDebug($"UploadCertificateFile: {path} {fileName}");
 
             string scriptBlock = $@"
                                     param($contents)
@@ -140,14 +142,14 @@ namespace JavaKeyStoreSSH.RemoteHandlers
 
         public override void RemoveCertificateFile(string path, string fileName)
         {
-            Logger.Debug($"RemoveCertificateFile: {path} {fileName}");
+            _logger.LogDebug($"RemoveCertificateFile: {path} {fileName}");
 
             RunCommand($"rm {path}{fileName}", null, false, null);
         }
 
         public override bool DoesStoreExist(string path, string fileName)
         {
-            Logger.Debug($"DoesStoreExist: {path} {fileName}");
+            _logger.LogDebug($"DoesStoreExist: {path} {fileName}");
 
             string NOT_EXISTS = "file not found";
             string result = RunCommand($"dir {path}{fileName}", null, false, null);

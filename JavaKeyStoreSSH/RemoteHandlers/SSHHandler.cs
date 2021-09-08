@@ -12,6 +12,8 @@ using System.Text;
 
 using Renci.SshNet;
 
+using Microsoft.Extensions.Logging;
+
 namespace JavaKeyStoreSSH.RemoteHandlers
 {
     class SSHHandler : BaseRemoteHandler
@@ -47,7 +49,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
 
         public override string RunCommand(string commandText, object[] arguments, bool withSudo, string[] passwordsToMaskInLog)
         {
-            Logger.Debug($"RunCommand: {Server}");
+            _logger.LogDebug($"RunCommand: {Server}");
 
             string sudo = $"sudo -i -S ";
             string echo = $"echo -e '\n' | ";
@@ -68,9 +70,9 @@ namespace JavaKeyStoreSSH.RemoteHandlers
 
                 using (SshCommand command = sshClient.CreateCommand($"{commandText}"))
                 {
-                    Logger.Debug($"RunCommand: {displayCommand}");
+                    _logger.LogDebug($"RunCommand: {displayCommand}");
                     command.Execute();
-                    Logger.Debug($"SSH Results: {displayCommand}::: {command.Result}::: {command.Error}");
+                    _logger.LogDebug($"SSH Results: {displayCommand}::: {command.Result}::: {command.Error}");
 
                     if (command.Result.ToLower().Contains(KEYTOOL_ERROR))
                         throw new ApplicationException(command.Result);
@@ -80,14 +82,14 @@ namespace JavaKeyStoreSSH.RemoteHandlers
             }
             catch (Exception ex)
             {
-                Logger.Debug($"Exception during RunCommand...{ExceptionHandler.FlattenExceptionMessages(ex, ex.Message)}");
+                _logger.LogDebug($"Exception during RunCommand...{ExceptionHandler.FlattenExceptionMessages(ex, ex.Message)}");
                 throw ex;
             }
         }
 
         public override void UploadCertificateFile(string path, string fileName, byte[] certBytes)
         {
-            Logger.Debug($"UploadCertificateFile: {path} {fileName}");
+            _logger.LogDebug($"UploadCertificateFile: {path} {fileName}");
 
             try
             {
@@ -105,8 +107,8 @@ namespace JavaKeyStoreSSH.RemoteHandlers
                     }
                     catch (Exception ex)
                     {
-                        Logger.Debug("Exception during upload...");
-                        Logger.Debug($"Upload Exception: {ExceptionHandler.FlattenExceptionMessages(ex, ex.Message)}");
+                        _logger.LogDebug("Exception during upload...");
+                        _logger.LogDebug($"Upload Exception: {ExceptionHandler.FlattenExceptionMessages(ex, ex.Message)}");
                         throw ex;
                     }
                     finally
@@ -117,21 +119,21 @@ namespace JavaKeyStoreSSH.RemoteHandlers
             }
             catch (Exception ex)
             {
-                Logger.Debug($"Exception making SFTP connection - {ex.Message}");
+                _logger.LogDebug($"Exception making SFTP connection - {ex.Message}");
                 throw ex;
             }
         }
 
         public override void RemoveCertificateFile(string path, string fileName)
         {
-            Logger.Debug($"RemoveCertificateFile: {path} {fileName}");
+            _logger.LogDebug($"RemoveCertificateFile: {path} {fileName}");
 
             RunCommand($"rm {path}{fileName}", null, ApplicationSettings.UseSudo, null);
         }
 
         public override bool DoesStoreExist(string path, string fileName)
         {
-            Logger.Debug($"DoesStoreExist: {path} {fileName}");
+            _logger.LogDebug($"DoesStoreExist: {path} {fileName}");
 
             string NOT_EXISTS = "no such file or directory";
             string result = RunCommand($"ls {path}{fileName}", null, ApplicationSettings.UseSudo, null);

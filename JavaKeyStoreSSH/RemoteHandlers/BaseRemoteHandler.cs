@@ -26,7 +26,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
 
         public BaseRemoteHandler()
         {
-            ILogger logger = LogHandler.GetClassLogger(this.GetType());
+            _logger = LogHandler.GetClassLogger(this.GetType());
         }
 
         public string Server { get; set; }

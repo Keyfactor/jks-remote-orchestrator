@@ -9,12 +9,11 @@ using System;
 using System.IO;
 using System.Linq;
 
-using Keyfactor.Platform.Extensions.Agents;
-using Keyfactor.Platform.Extensions.Agents.Enums;
-using Keyfactor.Platform.Extensions.Agents.Delegates;
-using Keyfactor.Platform.Extensions.Agents.Interfaces;
+using Keyfactor.Logging;
+using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Common.Enums;
 
-using CSS.Common.Logging;
+using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
@@ -22,82 +21,74 @@ using Org.BouncyCastle.Pkcs;
 
 namespace JavaKeyStoreSSH
 {
-    public class Management : LoggingClientBase, IAgentJobExtension
+    public class Management : IManagementJobExtension
     {
-        public string GetJobClass()
+        public string ExtensionName => "JKS-SSH";
+
+        public JobResult ProcessJob(ManagementJobConfiguration config)
         {
-            return "Management";
-        }
+            ILogger logger = LogHandler.GetClassLogger<Inventory>();
+            logger.LogDebug($"Begin Inventory...");
 
-        public string GetStoreType()
-        {
-            return "JKS-SSH";
-        }
+            JKSStore jksStore = new JKSStore(config.CertificateStoreDetails.ClientMachine, config.ServerUsername, config.ServerPassword, config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
 
-        public AnyJobCompleteInfo processJob(AnyJobConfigInfo config, SubmitInventoryUpdate submitInventory, SubmitEnrollmentRequest submitEnrollmentRequest, SubmitDiscoveryResults sdr)
-        {
-            Logger.Debug($"Begin Management...");
-
-            JKSStore jksStore = new JKSStore(config.Store.ClientMachine, config.Server.Username, config.Server.Password, config.Store.StorePath, config.Store.StorePassword);
-
-            dynamic jobProperties = JsonConvert.DeserializeObject(config.Job.Properties.ToString());
-            string entryPassword = jobProperties == null || jobProperties.entryPassword == null || string.IsNullOrEmpty(jobProperties.entryPassword.Value) ? string.Empty : jobProperties.entryPassword.Value;
+            string entryPassword = config.JobProperties == null || config.JobProperties["entryPassword"] == null || string.IsNullOrEmpty(config.JobProperties["entryPassword"].ToString()) ? string.Empty : config.JobProperties["entryPassword"].ToString();
 
             try
             {
                 ApplicationSettings.Initialize(this.GetType().Assembly.Location);
 
-                bool hasPassword = !string.IsNullOrEmpty(config.Job.PfxPassword);
+                bool hasPassword = !string.IsNullOrEmpty(config.JobCertificate.PrivateKeyPassword);
                 jksStore.Initialize(string.Join(",", string.Empty));
 
-                switch (config.Job.OperationType)
+                switch (config.OperationType)
                 {
-                    case AnyJobOperationType.Add:
+                    case CertStoreOperationType.Add:
                         if (!jksStore.DoesStoreExist())
                             throw new JKSException($"Java Keystore {jksStore.StorePath}{jksStore.StoreFileName} cannot be found.");
 
-                        byte[] certBytes = Convert.FromBase64String(config.Job.EntryContents);
+                        byte[] certBytes = Convert.FromBase64String(config.JobCertificate.Contents);
                         MemoryStream stream = new MemoryStream(certBytes);
                         Pkcs12Store store;
                         string sourceAlias;
 
                         if (hasPassword)
                         {
-                            store = new Pkcs12Store(stream, config.Job.PfxPassword.ToCharArray());
+                            store = new Pkcs12Store(stream, config.JobCertificate.PrivateKeyPassword.ToCharArray());
                             sourceAlias = store.Aliases.Cast<string>().FirstOrDefault(p => store.IsKeyEntry(p));
-                            jksStore.AddPFXCertificateToStore(sourceAlias, config.Job.Alias, certBytes, config.Job.PfxPassword, entryPassword, config.Job.Overwrite);
+                            jksStore.AddPFXCertificateToStore(sourceAlias, config.JobCertificate.Alias, certBytes, config.JobCertificate.PrivateKeyPassword, entryPassword, config.Overwrite);
                         }
                         else
-                            jksStore.AddCertificateToStore(config.Job.Alias, certBytes, config.Job.Overwrite);
+                            jksStore.AddCertificateToStore(config.JobCertificate.Alias, certBytes, config.Overwrite);
 
                         break;
 
-                    case AnyJobOperationType.Remove:
+                    case CertStoreOperationType.Remove:
                         if (!jksStore.DoesStoreExist())
                             throw new JKSException($"Java Keystore {jksStore.StorePath}{jksStore.StoreFileName} cannot be found.");
 
-                        jksStore.DeleteCertificateByAlias(config.Job.Alias);
+                        jksStore.DeleteCertificateByAlias(config.JobCertificate.Alias);
 
                         break;
 
-                    case AnyJobOperationType.Create:
-                        Logger.Debug($"Begin Create Operation for {config.Store.StorePath} on {config.Store.ClientMachine}.");
-                        jksStore.CreateCertificateStore(config.Store.StorePath, config.Store.StorePassword);
+                    case CertStoreOperationType.Create:
+                        logger.LogDebug($"Begin Create Operation for {config.CertificateStoreDetails.StorePath} on {config.CertificateStoreDetails.ClientMachine}.");
+                        jksStore.CreateCertificateStore(config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
                         break; 
                     default:
-                        return new AnyJobCompleteInfo() { Status = 4, Message = $"Site {config.Store.StorePath} on server {config.Store.ClientMachine}: Unsupported operation: {config.Job.OperationType.ToString()}" };
+                        return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, FailureMessage = $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}: Unsupported operation: {config.OperationType.ToString()}" };
                 }
             }
             catch (Exception ex)
             {
-                return new AnyJobCompleteInfo() { Status = 4, Message = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.Store.StorePath} on server {config.Store.ClientMachine}:") };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}:") };
             }
             finally
             {
                 jksStore.Terminate();
             }
 
-            return new AnyJobCompleteInfo() { Status = 2, Message = "Successful" };
+            return new JobResult() { Result = OrchestratorJobStatusJobResult.Success };
         }
     }
 }
