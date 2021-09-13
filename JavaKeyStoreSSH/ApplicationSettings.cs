@@ -22,6 +22,7 @@ namespace JavaKeyStoreSSH
         public static bool UseSeparateUploadFilePath { get; set; }
         public static string SeparateUploadFilePath { get; set; }
         public static bool FindKeytoolPathOnWindows { get; set; }
+        public static bool UseNegotiateAuth { get; set; }
 
         public static void Initialize(string currLocation)
         {
@@ -56,6 +57,7 @@ namespace JavaKeyStoreSSH
             UseSeparateUploadFilePath = jsonContents.UseSeparateUploadFilePath.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
             SeparateUploadFilePath = AddTrailingSlash(jsonContents.SeparateUploadFilePath.Value);
             FindKeytoolPathOnWindows = jsonContents.FindKeytoolPathOnWindows.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
+            UseNegotiateAuth = jsonContents.UseNegotiateAuth.Value.Equals("Y", System.StringComparison.OrdinalIgnoreCase);
         }
 
         private static string AddTrailingSlash(string path)
@@ -81,6 +83,8 @@ namespace JavaKeyStoreSSH
                 errors += "SeparateUploadFilePath, ";
             if (jsonContents.FindKeytoolPathOnWindows == null)
                 errors += "FindKeytoolPathOnWindows, ";
+            if (jsonContents.UseNegotiateAuth == null)
+                errors += "UseNegotiateAuth, ";
 
             if (errors.Length > 0)
                 throw new JKSException($"The following configuration items are missing from the config.json file: {errors.Substring(0, errors.Length-2)}");
