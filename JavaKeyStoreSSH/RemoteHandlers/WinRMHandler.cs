@@ -142,7 +142,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
         {
             Logger.Debug($"RemoveCertificateFile: {path} {fileName}");
 
-            RunCommand($"rm {path}{fileName}", null, false, null);
+            RunCommand($"rm '{path}{fileName}'", null, false, null);
         }
 
         public override bool DoesStoreExist(string path, string fileName)
@@ -150,7 +150,7 @@ namespace JavaKeyStoreSSH.RemoteHandlers
             Logger.Debug($"DoesStoreExist: {path} {fileName}");
 
             string NOT_EXISTS = "file not found";
-            string result = RunCommand($"dir {path}{fileName}", null, false, null);
+            string result = RunCommand($"dir '{path}{fileName}'", null, false, null);
 
             return !result.ToLower().Contains(NOT_EXISTS);
         }
