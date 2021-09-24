@@ -17,7 +17,7 @@ using Keyfactor.Orchestrators.Common.Enums;
 
 using Microsoft.Extensions.Logging;
 
-namespace JavaKeyStoreSSH
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 {
     public class Discovery : IDiscoveryJobExtension
     {
@@ -60,7 +60,7 @@ namespace JavaKeyStoreSSH
             }
             catch (Exception ex)
             {
-                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Server {config.ClientMachine}:") };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, JobHistoryId = config.JobHistoryId, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Server {config.ClientMachine}:") };
             }
             finally
             {
@@ -70,11 +70,11 @@ namespace JavaKeyStoreSSH
             try
             {
                 submitDiscovery.Invoke(locations);
-                return new JobResult() { Result = OrchestratorJobStatusJobResult.Success };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Success, JobHistoryId = config.JobHistoryId };
             }
             catch (Exception ex)
             {
-                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Server {config.ClientMachine}:") };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, JobHistoryId = config.JobHistoryId, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Server {config.ClientMachine}:") };
             }
         }
     }

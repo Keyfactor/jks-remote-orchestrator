@@ -19,7 +19,7 @@ using Newtonsoft.Json;
 
 using Org.BouncyCastle.Pkcs;
 
-namespace JavaKeyStoreSSH
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 {
     public class Management : IManagementJobExtension
     {
@@ -32,7 +32,7 @@ namespace JavaKeyStoreSSH
 
             JKSStore jksStore = new JKSStore(config.CertificateStoreDetails.ClientMachine, config.ServerUsername, config.ServerPassword, config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
 
-            string entryPassword = config.JobProperties == null || config.JobProperties["entryPassword"] == null || string.IsNullOrEmpty(config.JobProperties["entryPassword"].ToString()) ? string.Empty : config.JobProperties["entryPassword"].ToString();
+            string entryPassword = config.JobProperties == null || !config.JobProperties.ContainsKey("entryPassword") || string.IsNullOrEmpty(config.JobProperties["entryPassword"].ToString()) ? string.Empty : config.JobProperties["entryPassword"].ToString();
 
             try
             {
@@ -76,19 +76,19 @@ namespace JavaKeyStoreSSH
                         jksStore.CreateCertificateStore(config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
                         break; 
                     default:
-                        return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, FailureMessage = $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}: Unsupported operation: {config.OperationType.ToString()}" };
+                        return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, JobHistoryId = config.JobHistoryId, FailureMessage = $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}: Unsupported operation: {config.OperationType.ToString()}" };
                 }
             }
             catch (Exception ex)
             {
-                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}:") };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, JobHistoryId = config.JobHistoryId, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}:") };
             }
             finally
             {
                 jksStore.Terminate();
             }
 
-            return new JobResult() { Result = OrchestratorJobStatusJobResult.Success };
+            return new JobResult() { Result = OrchestratorJobStatusJobResult.Success, JobHistoryId = config.JobHistoryId };
         }
     }
 }

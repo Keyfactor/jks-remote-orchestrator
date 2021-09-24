@@ -12,10 +12,10 @@ using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 
-using JavaKeyStoreSSH.RemoteHandlers;
-using Keyfactor.Extensions.Pam.Utilities;
+using Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.RemoteHandlers;
+//using Keyfactor.Extensions.Pam.Utilities;
 
-namespace JavaKeyStoreSSH
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 {
     internal class JKSStore
     {
@@ -71,7 +71,8 @@ namespace JavaKeyStoreSSH
         internal void Initialize(string extensions)
         {
             if (ServerType == ServerTypeEnum.Linux)
-                SSH = new SSHHandler(Server, ServerId, PamUtility.ResolvePassword(ServerPassword));
+                SSH = new SSHHandler(Server, ServerId, ServerPassword);
+                //SSH = new SSHHandler(Server, ServerId, PamUtility.ResolvePassword(ServerPassword));
             else
                 SSH = new WinRMHandler(Server);
 

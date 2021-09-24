@@ -14,7 +14,7 @@ using Renci.SshNet;
 
 using Microsoft.Extensions.Logging;
 
-namespace JavaKeyStoreSSH.RemoteHandlers
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.RemoteHandlers
 {
     class SSHHandler : BaseRemoteHandler
     {

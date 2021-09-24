@@ -16,7 +16,7 @@ using Keyfactor.Logging;
 
 using Microsoft.Extensions.Logging;
 
-namespace JavaKeyStoreSSH
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 {
     public class Inventory : IInventoryJobExtension
     {
@@ -28,7 +28,6 @@ namespace JavaKeyStoreSSH
             logger.LogDebug($"Begin Inventory...");
 
             JKSStore jksStore = new JKSStore(config.CertificateStoreDetails.ClientMachine, config.ServerUsername, config.ServerPassword, config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
-
             List<CurrentInventoryItem> inventoryItems = new List<CurrentInventoryItem>();
             try
             {
@@ -55,11 +54,11 @@ namespace JavaKeyStoreSSH
                         UseChainLevel = pemCertificates.Count > 1,
                         Certificates = pemCertificates.ToArray()
                     });
-                }  
+                }
             }
             catch (Exception ex)
             {
-                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}:") };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, JobHistoryId = config.JobHistoryId, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}:") };
             }
             finally
             {
@@ -69,7 +68,7 @@ namespace JavaKeyStoreSSH
             try
             {
                 submitInventory.Invoke(inventoryItems);
-                return new JobResult() { Result = OrchestratorJobStatusJobResult.Success };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Success, JobHistoryId = config.JobHistoryId };
             }
             catch (Exception ex)
             {

@@ -15,7 +15,7 @@ using Keyfactor.Logging;
 
 using Microsoft.Extensions.Logging;
 
-namespace JavaKeyStoreSSH.RemoteHandlers
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.RemoteHandlers
 {
     abstract class BaseRemoteHandler : IRemoteHandler
     {
