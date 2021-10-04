@@ -181,7 +181,7 @@ Modify the six values as appropriate (all must be present regardless of Linux or
 
 **PreRunScript** (Linux only) - The name of the script to be run on the orchestrated/managed server. This value will be ignored if UsePrerunScript is not set to &quot;Y&quot;. This script MUST be located in the JKS-SSH installation folder.
 
-**PreRunScriptDestinationPath** (Linux only) – The folder on the destination/orchestrated Linux server where the AnyAgent will copy the script to (from the JKS-SSH installation folder) and execute it. The script will be removed at the end of the job.
+**PreRunScriptDestinationPath** (Linux only) – The folder on the destination/orchestrated Linux server where the AnyAgent will copy the script to (from the JKS-SSH installation folder on the orchestrator server) and execute it. The script will be removed at the end of the job.
 
 **UseSeparateUploadFilePath** (Linux only) – When adding a certificate to a Java Keystore, the Java Keystore SSH AnyAgent must upload the certificate being deployed to the server where the certificate store resides. Setting this value to &quot;Y&quot; looks to the next setting, SeparateUploadFilePath, to determine where this file should be uploaded. Set this value to &quot;N&quot; to use the same path where the Java Keystore being managed resides. The certificate file uploaded to either location will be removed at the end of the process.
 
