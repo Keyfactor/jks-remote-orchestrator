@@ -31,8 +31,8 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
             logger.LogDebug($"Begin Inventory...");
 
             JKSStore jksStore = new JKSStore(config.CertificateStoreDetails.ClientMachine, config.ServerUsername, config.ServerPassword, config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
-
-            string entryPassword = config.JobProperties == null || !config.JobProperties.ContainsKey("entryPassword") || string.IsNullOrEmpty(config.JobProperties["entryPassword"].ToString()) ? string.Empty : config.JobProperties["entryPassword"].ToString();
+            
+            string entryPassword = config.JobProperties == null || !config.JobProperties.ContainsKey("entryPassword") || string.IsNullOrEmpty((config.JobProperties["entryPassword"] ?? string.Empty).ToString()) ? string.Empty : config.JobProperties["entryPassword"].ToString();
 
             try
             {
@@ -57,7 +57,7 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
                             store = new Pkcs12Store(stream, config.JobCertificate.PrivateKeyPassword.ToCharArray());
                             sourceAlias = store.Aliases.Cast<string>().FirstOrDefault(p => store.IsKeyEntry(p));
                             jksStore.AddPFXCertificateToStore(sourceAlias, config.JobCertificate.Alias, certBytes, config.JobCertificate.PrivateKeyPassword, entryPassword, config.Overwrite);
-                        }
+                        } 
                         else
                             jksStore.AddCertificateToStore(config.JobCertificate.Alias, certBytes, config.Overwrite);
 
