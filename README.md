@@ -16,7 +16,7 @@ The JavaKeystore Windows AnyAgent implements the following capabilities:
 4. Management (Add) - Add a certificate to a defined certificate store.
 5. Management (Remove) - Remove a certificate from a defined certificate store.
 
-The JavaKeystore Windows AnyAgent supports the following types of JavaKeysore:
+The JavaKeystore Windows AnyAgent supports the following types of JavaKeystore:
 1. Trust stores (multiple public certificates with no private keys)
 2. Stores with one or more aliases
 3. Stores with certificate chains included in the alias (inventory only)
