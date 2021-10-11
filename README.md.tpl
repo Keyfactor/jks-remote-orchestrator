@@ -26,10 +26,9 @@ The JavaKeystore Windows AnyAgent supports the following types of JavaKeysore:
 
 The version number of a the JavaKeystore Windows AnyAgent can be verified by right clicking on the JavaKeyStoreSSH.dll file in the Plugins installation folder, selecting Properties, and then clicking on the Details tab.
 
-
 ## Keyfactor Version Supported
 
-The JavaKeystore Windows AnyAgent has been tested against Keyfactor version 8.5.2 but should work against earlier or later versions.
+Versions >= 2.0 are compiled under the .Net Core 3.1 target framework and are compatible for use with the Keyfactor Universal Orchestrator.  Versions < 2.0 are compiled under a .Net Framework target framework and are compatible for use with the Keyfactor Windows Orchestrator.
 
 
 ## Security Considerations
@@ -50,50 +49,20 @@ The JavaKeystore Windows AnyAgent has been tested against Keyfactor version 8.5.
 
 In Keyfactor Command create a new Certificate Store Type similar to the one below:
 
-![](Images/Image1.png)
+![](Images/Image1a.png)
+![](Images/Image1b.png)
+![](Images/Image1c.png)
+![](Images/Image1d.png)
 
 - **Name** – Required. The display name of the new Certificate Store Type
-- **Short Name** – Required. **MUST** be &quot;JKS-SSH&quot;
-- **Needs Server, Blueprint Allowed, Requires Store Password, Supports Entry Password** – All checked/unchecked as shown
-- **Supports Custom Alias** – Required. Each certificate MUST have an alias associated with it for the store.
-- **Use PowerShell** – Unchecked
-- **Store PathType** – Freeform (user will enter the the location of the store)
-- **Private Keys** – Optional (a certificate in a Java Keystore may or may not contain a private key)
-- **PFX Password Style** – Default
-- **Job Types** – Discovery, Inventory, Add, Remove, and Create are the 4 job types implemented by this AnyAgent
-- **Management Job Custom Fields** - Set to "entryPassword".  This will allow users when enrolling a new certificate with certificate store delivery or adding an existing certificate to a store to specify a separate password from the certificate store password to be used as the key password for that entry.  If this field is left blank when adding a certificate to a store, the store password will be used for the key password.  You can optionally omit setting this field up on the Certificate Store Type set up screen.  In this case the key password will ALWAYS be set to the store password.
+- **Short Name** – Required. Similar to **Name**.  A shorter display vaiue.
+- **Custom Capability** - Required.  **Must** be JKS-SSH.  **NOTE:** If not adding this manually but rather upgrading to Keyfactor 9 with this being an existing store type, the Short Name of JKS-SSH from the previous store type will be moved to this field.  It will not show up as checked and the value will not be shown, but as long as the **Short Name** shows as JKS-SSH, this will be correct.
+- **Supported Job Types, General Settings, Password Settings, Store Path Types, and Other Settings** – All checked/unchecked as shown
+- **Entry Parameters** - Set to "entryPassword" to allow users when enrolling a new certificate with certificate store delivery or adding an existing certificate to a store to specify a separate password from the certificate store password to be used as the key password for that entry.  If this field is left blank when adding a certificate to a store, the store password will be used for the key password.  You can optionally omit setting this field up on the Certificate Store Type set up screen.  In this case the key password will ALWAYS be set to the store password.
 
-**2. Register the JavaKeystore AnyAgent with Keyfactor**
+**2. Create the proper Extension folder and move the installation binaries to this location**
 
-Open the Keyfactor Windows Agent Configuration Wizard and perform the tasks as illustrated below:
-
-![](Images/Image2.png)
-
-- Click **\<Next\>**
-
-![](Images/Image3.png)
-
-- If you have configured the agent service previously, you should be able to skip to just click **\<Next\>.** Otherwise, enter the service account Username and Password you wish to run the Keyfactor Windows Agent Service under, click **\<Update Windows Service Account\>** and click **\<Next\>.**
-
-![](Images/Image4.png)
-
-- If you have configured the agent service previously, you should be able to skip to just re-enter the password to the service account the agent service will run under, click **\<Validate Keyfactor Connection\>** and then **\<Next\>.**
-
-![](Images/Image5.png)
-
-- Select the agent you are adding capabilities for (in this case, JavaKeystore, and also select the specific capabilities (Discovery, Inventory and Management in this example). Click **\<Next\>**.
-
-![](Images/Image6.png)
-
-- For agent configuration purposes, this screen can be skipped by clicking **\<Next\>**.
-
-![](Images/Image7.png)
-
-- For each AnyAgent implementation, check **Load assemblies containing extension modules from other location** , browse to the location of the compiled AnyAgent dll, and click **\<Validate Capabilities\>**. Once all AnyAgents have been validated, click **\<Apply Configuration\>**.
-
-![](Images/Image8.png)
-
-- If the Keyfactor Agent Configuration Wizard configured everything correctly, you should see the dialog above.
+Download the desired AnyAgent version at https://github.com/Keyfactor/jks-remote-orchestrator.  Within Windows File Explorer, navigate to the Keyfactor Orchestrator installation folder (usually C:\Program Files\Keyfactor\Keyfactor Orchestrator), find the "extensions" folder, and under that create a new folder named "JKS-SSH".  Under the JKS-SSH folder copy all of the files from the downloaded release to this location.
 
 **3a. (Optional) Create a JavaKeystore Certificate Store within Keyfactor Command**
 
@@ -101,7 +70,7 @@ If you choose to manually create a JavaKeystore store In Keyfactor Command rathe
 
 ![](Images/Image9.png)
 
-- **Category** – Required. The JKS SSH	 type name must be selected.
+- **Category** – Required. The JKS SSH type name must be selected.
 - **Container** – Optional. Select a container if utilized.
 - **Client Machine &amp; Credentials** – Required. The server name or IP Address and login credentials for the server where the Certificate Store is located.  The credentials for server login can be any of:
   
