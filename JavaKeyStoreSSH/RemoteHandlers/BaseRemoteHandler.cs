@@ -11,15 +11,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CSS.Common.Logging;
+using Keyfactor.Logging;
 
-namespace JavaKeyStoreSSH.RemoteHandlers
+using Microsoft.Extensions.Logging;
+
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.RemoteHandlers
 {
-    abstract class BaseRemoteHandler : LoggingClientBase, IRemoteHandler
+    abstract class BaseRemoteHandler : IRemoteHandler
     {
+        internal ILogger _logger;
         internal const string KEYTOOL_ERROR = "password was incorrect";
         internal const string PASSWORD_MASK_VALUE = "[PASSWORD]";
         internal const int PASSWORD_LENGTH_MAX = 100;
+
+        public BaseRemoteHandler()
+        {
+            _logger = LogHandler.GetClassLogger(this.GetType());
+        }
 
         public string Server { get; set; }
 
