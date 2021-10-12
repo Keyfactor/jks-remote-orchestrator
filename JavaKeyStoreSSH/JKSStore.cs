@@ -12,10 +12,10 @@ using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 
-using JavaKeyStoreSSH.RemoteHandlers;
-using Keyfactor.Extensions.Pam.Utilities;
+using Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.RemoteHandlers;
+//using Keyfactor.Extensions.Pam.Utilities;
 
-namespace JavaKeyStoreSSH
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 {
     internal class JKSStore
     {
@@ -71,7 +71,8 @@ namespace JavaKeyStoreSSH
         internal void Initialize(string extensions)
         {
             if (ServerType == ServerTypeEnum.Linux)
-                SSH = new SSHHandler(Server, ServerId, PamUtility.ResolvePassword(ServerPassword));
+                SSH = new SSHHandler(Server, ServerId, ServerPassword);
+                //SSH = new SSHHandler(Server, ServerId, PamUtility.ResolvePassword(ServerPassword));
             else
                 SSH = new WinRMHandler(Server);
 
@@ -246,7 +247,7 @@ namespace JavaKeyStoreSSH
         internal void CreateCertificateStore(string storePath, string storePassword)
         {
             //No option to create a blank store.  Generate a self signed cert with some default and limited validity.
-            string keyToolCommand = $"{KeytoolPath}keytool -genkeypair -keystore '{storePath}' -storepass {storePassword} -dname \"cn=New Certificate Store\" -validity 1 -alias \"NewCertStore\"";
+            string keyToolCommand = $"{KeytoolPath}keytool -genkeypair -keystore {storePath} -storepass {storePassword} -dname \"cn=New Certificate Store\" -validity 1 -alias \"NewCertStore\"";
             SSH.RunCommand(keyToolCommand, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, StorePassword == null ? null : new string[] { StorePassword });
         }
 

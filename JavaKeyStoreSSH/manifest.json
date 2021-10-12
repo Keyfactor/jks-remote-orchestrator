@@ -1,0 +1,18 @@
+﻿{
+  "extensions": {
+    "Keyfactor.Orchestrators.Extensions.IOrchestratorJobExtension": {
+      "CertStores.JKS-SSH.Inventory": {
+        "assemblypath": "JavaKeyStoreSSH.dll",
+        "TypeFullName": "Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.Inventory"
+      },
+      "CertStores.JKS-SSH.Management": {
+        "assemblypath": "JavaKeyStoreSSH.dll",
+        "TypeFullName": "Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.Management"
+      },
+      "CertStores.JKS-SSH.Discovery": {
+        "assemblypath": "JavaKeyStoreSSH.dll",
+        "TypeFullName": "Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.Discovery"
+      }
+    }
+  }
+}
