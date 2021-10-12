@@ -50,7 +50,6 @@ Versions >= 2.0 are compiled under the .Net Core 3.1 target framework and are co
 In Keyfactor Command create a new Certificate Store Type similar to the one below:
 
 ![](Images/Image1a.png)
-
 ![](Images/Image1b.png)
 ![](Images/Image1c.png)
 ![](Images/Image1d.png)
