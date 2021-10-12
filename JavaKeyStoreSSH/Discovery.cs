@@ -11,39 +11,32 @@ using System.Linq;
 
 using Newtonsoft.Json;
 
-using Keyfactor.Platform.Extensions.Agents;
-using Keyfactor.Platform.Extensions.Agents.Delegates;
-using Keyfactor.Platform.Extensions.Agents.Interfaces;
+using Keyfactor.Logging;
+using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Common.Enums;
 
-using CSS.Common.Logging;
+using Microsoft.Extensions.Logging;
 
-namespace JavaKeyStoreSSH
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 {
-    public class Discovery : LoggingClientBase, IAgentJobExtension
+    public class Discovery : IDiscoveryJobExtension
     {
-        public string GetJobClass()
-        {
-            return "Discovery";
-        }
+        public string ExtensionName => "JKS-SSH";
 
-        public string GetStoreType()
+        public JobResult ProcessJob(DiscoveryJobConfiguration config, SubmitDiscoveryUpdate submitDiscovery)
         {
-            return "JKS-SSH";
-        }
-            
-        public AnyJobCompleteInfo processJob(AnyJobConfigInfo config, SubmitInventoryUpdate submitInventory, SubmitEnrollmentRequest submitEnrollmentRequest, SubmitDiscoveryResults sdr)
-        {
-            Logger.Debug($"Begin Discovery...");
+            ILogger logger = LogHandler.GetClassLogger<Inventory>();
+            logger.LogDebug($"Begin Discovery...");
+
             List<string> locations = new List<string>();
             string server = string.Empty;
             
-            dynamic properties = JsonConvert.DeserializeObject(config.Job.Properties.ToString());
-            string[] directoriesToSearch = properties.dirs.Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            string[] extensionsToSearch = properties.extensions.Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            string[] ignoredDirs = properties.ignoreddirs.Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            string[] filesTosearch = properties.patterns.Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] directoriesToSearch = config.JobProperties["dirs"].ToString().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] extensionsToSearch = config.JobProperties["extensions"].ToString().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] ignoredDirs = config.JobProperties["ignoreddirs"].ToString().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] filesTosearch = config.JobProperties["patterns"].ToString().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-            JKSStore jksStore = new JKSStore(config.Store.ClientMachine, config.Server.Username, config.Server.Password, directoriesToSearch[0].Substring(0, 1) == "/" ? JKSStore.ServerTypeEnum.Linux : JKSStore.ServerTypeEnum.Windows);
+            JKSStore jksStore = new JKSStore(config.ClientMachine, config.ServerUsername, config.ServerPassword, directoriesToSearch[0].Substring(0, 1) == "/" ? JKSStore.ServerTypeEnum.Linux : JKSStore.ServerTypeEnum.Windows);
 
             try
             {
@@ -67,7 +60,7 @@ namespace JavaKeyStoreSSH
             }
             catch (Exception ex)
             {
-                return new AnyJobCompleteInfo() { Status = 4, Message = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.Store.StorePath} on server {config.Store.ClientMachine}:") };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, JobHistoryId = config.JobHistoryId, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Server {config.ClientMachine}:") };
             }
             finally
             {
@@ -76,12 +69,12 @@ namespace JavaKeyStoreSSH
 
             try
             {
-                sdr.Invoke(locations);
-                return new AnyJobCompleteInfo() { Status = 2, Message = "Successful" };
+                submitDiscovery.Invoke(locations);
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Success, JobHistoryId = config.JobHistoryId };
             }
             catch (Exception ex)
             {
-                return new AnyJobCompleteInfo() { Status = 4, Message = ExceptionHandler.FlattenExceptionMessages(ex, $"Site {config.Store.StorePath} on server {config.Store.ClientMachine}:") };
+                return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, JobHistoryId = config.JobHistoryId, FailureMessage = ExceptionHandler.FlattenExceptionMessages(ex, $"Server {config.ClientMachine}:") };
             }
         }
     }
