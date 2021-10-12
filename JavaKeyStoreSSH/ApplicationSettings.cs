@@ -10,7 +10,7 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-namespace JavaKeyStoreSSH
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 {
     class ApplicationSettings
     {
