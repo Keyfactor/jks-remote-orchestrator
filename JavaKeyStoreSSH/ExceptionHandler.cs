@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JavaKeyStoreSSH
+namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 {
     class ExceptionHandler
     {
