@@ -16,7 +16,7 @@ The JavaKeystore Windows AnyAgent implements the following capabilities:
 4. Management (Add) - Add a certificate to a defined certificate store.
 5. Management (Remove) - Remove a certificate from a defined certificate store.
 
-The JavaKeystore Windows AnyAgent supports the following types of JavaKeysore:
+The JavaKeystore Windows AnyAgent supports the following types of JavaKeystore:
 1. Trust stores (multiple public certificates with no private keys)
 2. Stores with one or more aliases
 3. Stores with certificate chains included in the alias (inventory only)
@@ -26,10 +26,9 @@ The JavaKeystore Windows AnyAgent supports the following types of JavaKeysore:
 
 The version number of a the JavaKeystore Windows AnyAgent can be verified by right clicking on the JavaKeyStoreSSH.dll file in the Plugins installation folder, selecting Properties, and then clicking on the Details tab.
 
-
 ## Keyfactor Version Supported
 
-The JavaKeystore Windows AnyAgent has been tested against Keyfactor version 8.5.2 but should work against earlier or later versions.
+Versions >= 2.0 are compiled under the .Net Core 3.1 target framework and are compatible for use with the Keyfactor Universal Orchestrator.  Versions < 2.0 are compiled under a .Net Framework target framework and are compatible for use with the Keyfactor Windows Orchestrator.
 
 
 ## Security Considerations
@@ -50,50 +49,20 @@ The JavaKeystore Windows AnyAgent has been tested against Keyfactor version 8.5.
 
 In Keyfactor Command create a new Certificate Store Type similar to the one below:
 
-![](Images/Image1.png)
+![](Images/Image1a.png)
+![](Images/Image1b.png)
+![](Images/Image1c.png)
+![](Images/Image1d.png)
 
 - **Name** – Required. The display name of the new Certificate Store Type
-- **Short Name** – Required. **MUST** be &quot;JKS-SSH&quot;
-- **Needs Server, Blueprint Allowed, Requires Store Password, Supports Entry Password** – All checked/unchecked as shown
-- **Supports Custom Alias** – Required. Each certificate MUST have an alias associated with it for the store.
-- **Use PowerShell** – Unchecked
-- **Store PathType** – Freeform (user will enter the the location of the store)
-- **Private Keys** – Optional (a certificate in a Java Keystore may or may not contain a private key)
-- **PFX Password Style** – Default
-- **Job Types** – Discovery, Inventory, Add, Remove, and Create are the 4 job types implemented by this AnyAgent
-- **Management Job Custom Fields** - Set to "entryPassword".  This will allow users when enrolling a new certificate with certificate store delivery or adding an existing certificate to a store to specify a separate password from the certificate store password to be used as the key password for that entry.  If this field is left blank when adding a certificate to a store, the store password will be used for the key password.  You can optionally omit setting this field up on the Certificate Store Type set up screen.  In this case the key password will ALWAYS be set to the store password.
+- **Short Name** – Required. Similar to **Name**.  A shorter display vaiue.
+- **Custom Capability** - Required.  **Must** be JKS-SSH.  **NOTE:** If not adding this manually but rather upgrading to Keyfactor 9 with this being an existing store type, the Short Name of JKS-SSH from the previous store type will be moved to this field.  It will not show up as checked and the value will not be shown, but as long as the **Short Name** shows as JKS-SSH, this will be correct.
+- **Supported Job Types, General Settings, Password Settings, Store Path Types, and Other Settings** – All checked/unchecked as shown
+- **Entry Parameters** - Set to "entryPassword" to allow users when enrolling a new certificate with certificate store delivery or adding an existing certificate to a store to specify a separate password from the certificate store password to be used as the key password for that entry.  If this field is left blank when adding a certificate to a store, the store password will be used for the key password.  You can optionally omit setting this field up on the Certificate Store Type set up screen.  In this case the key password will ALWAYS be set to the store password.
 
-**2. Register the JavaKeystore AnyAgent with Keyfactor**
+**2. Create the proper Extension folder and move the installation binaries to this location**
 
-Open the Keyfactor Windows Agent Configuration Wizard and perform the tasks as illustrated below:
-
-![](Images/Image2.png)
-
-- Click **\<Next\>**
-
-![](Images/Image3.png)
-
-- If you have configured the agent service previously, you should be able to skip to just click **\<Next\>.** Otherwise, enter the service account Username and Password you wish to run the Keyfactor Windows Agent Service under, click **\<Update Windows Service Account\>** and click **\<Next\>.**
-
-![](Images/Image4.png)
-
-- If you have configured the agent service previously, you should be able to skip to just re-enter the password to the service account the agent service will run under, click **\<Validate Keyfactor Connection\>** and then **\<Next\>.**
-
-![](Images/Image5.png)
-
-- Select the agent you are adding capabilities for (in this case, JavaKeystore, and also select the specific capabilities (Discovery, Inventory and Management in this example). Click **\<Next\>**.
-
-![](Images/Image6.png)
-
-- For agent configuration purposes, this screen can be skipped by clicking **\<Next\>**.
-
-![](Images/Image7.png)
-
-- For each AnyAgent implementation, check **Load assemblies containing extension modules from other location** , browse to the location of the compiled AnyAgent dll, and click **\<Validate Capabilities\>**. Once all AnyAgents have been validated, click **\<Apply Configuration\>**.
-
-![](Images/Image8.png)
-
-- If the Keyfactor Agent Configuration Wizard configured everything correctly, you should see the dialog above.
+Download the desired AnyAgent version at https://github.com/Keyfactor/jks-remote-orchestrator.  Within Windows File Explorer, navigate to the Keyfactor Orchestrator installation folder (usually C:\Program Files\Keyfactor\Keyfactor Orchestrator), find the "extensions" folder, and under that create a new folder named "JKS-SSH".  Under the JKS-SSH folder copy all of the files from the downloaded release to this location.
 
 **3a. (Optional) Create a JavaKeystore Certificate Store within Keyfactor Command**
 
@@ -101,7 +70,7 @@ If you choose to manually create a JavaKeystore store In Keyfactor Command rathe
 
 ![](Images/Image9.png)
 
-- **Category** – Required. The JKS SSH	 type name must be selected.
+- **Category** – Required. The JKS SSH type name must be selected.
 - **Container** – Optional. Select a container if utilized.
 - **Client Machine &amp; Credentials** – Required. The server name or IP Address and login credentials for the server where the Certificate Store is located.  The credentials for server login can be any of:
   
@@ -113,7 +82,7 @@ If you choose to manually create a JavaKeystore store In Keyfactor Command rathe
   
   When setting up a Windows server, the format of the machine name must be – [http://_ServerName_:5985](http://ServerName:5985/), where &quot;5985&quot; is the WinRM port number. 5985 is the standard, but if your organization uses a different, use that.  The credentials used will be the Keyfactor Command service account.  Because of this, for Windows orchestrated servers, setting an additional set of credentials is not necessary.  **However, it is required that the *Change Credentials* link still be clicked on and the resulting dialog closed by clicking OK.**
   
-- **Store Path** – Required. The FULL PATH and file name of the Java Keystore being managed. File paths on Linux servers will always begin with a &quot;/&quot;. Windows servers will always begin with the drive letter, colon, and backslash, such as &quot;c:\\&quot;.
+- **Store Path** – Required. The FULL PATH and file name of the Java Keystore being managed. File paths on Linux servers will always begin with a &quot;/&quot;. Windows servers will always begin with the drive letter, colon, and backslash, such as &quot;c:\&quot;.
 - **Orchestrator** – Select the orchestrator you wish to use to manage this store
 - **Store Password** – Set the store password for the Java Keystore
 - **Inventory Schedule** – Set a schedule for running Inventory jobs or none, if you choose not to schedule Inventory at this time.
@@ -157,17 +126,17 @@ As a configuration step, you must modify the config.json file, found in the plug
     
 &quot;UseSudo&quot;: &quot;N&quot;,
 
-&quot;UsePreRunScript&quot;: &quot;N&quot;,
+&quot;UsePrerunScript&quot;: &quot;N&quot;,
 
-&quot;PreRunScript&quot;: &quot;ScriptName.sh&quot;,
+&quot;PreRunScript&quot;: &quot;ScriptName.sh&quot;
 
-&quot;PreRunScriptDestinationPath&quot;: &quot;/path/to/script/&quot;,
+&quot;PreRunScriptDestinationPath&quot;: &quot;/path/to/script/&quot;
 
 &quot;UseSeparateUploadFilePath&quot;: &quot;N&quot;,
 
 &quot;SeparateUploadFilePath&quot;: &quot;/path/to/upload/folder/&quot;,
 
-&quot;FindKeytoolPathOnWindows&quot;: &quot;N&quot;,
+&quot;FindKeytoolPathOnWindows&quot;: &quot;N&quot;
 
 &quot;UseNegotiateAuth&quot;: &quot;N&quot;
 
@@ -177,11 +146,11 @@ Modify the six values as appropriate (all must be present regardless of Linux or
 
 **UseSudo** (Linux only) - to determine whether to prefix certain Linux command with "sudo". This can be very helpful in ensuring that the user id running commands ssh uses "least permissions necessary" to process each task. Setting this value to "Y" will prefix all Linux commands with "sudo" with the expectation that the command being executed on the orchestrated Linux server will look in the sudoers file to determine whether the logged in ID has elevated permissions for that specific command. For orchestrated Windows servers, this setting has no effect. Setting this value to "N" will result in "sudo" not being added to Linux commands.
 
-**UsePreRunScript** (Linux only) – &quot;Y&quot; – The script identified in &quot;PreRunScript&quot; will be executed prior to the rest of the job. &quot;N&quot; – Do not run any pre-precessing script.
+**UsePrerunScript** (Linux only) – &quot;Y&quot; – The script identified in &quot;PreRunScript&quot; will be executed prior to the rest of the job. &quot;N&quot; – Do not run any pre-precessing script.
 
 **PreRunScript** (Linux only) - The name of the script to be run on the orchestrated/managed server. This value will be ignored if UsePrerunScript is not set to &quot;Y&quot;. This script MUST be located in the JKS-SSH installation folder.
 
-**PreRunScriptDestinationPath** (Linux only) – The folder on the destination/orchestrated Linux server where the AnyAgent will copy the script to (from the JKS-SSH installation folder on the orchestrator server) and execute it. The script will be removed at the end of the job.
+**PreRunScriptDestinationPath** (Linux only) – The folder on the destination/orchestrated Linux server where the script should be copied to and executed from. The script will be removed at the end of the job.
 
 **UseSeparateUploadFilePath** (Linux only) – When adding a certificate to a Java Keystore, the Java Keystore SSH AnyAgent must upload the certificate being deployed to the server where the certificate store resides. Setting this value to &quot;Y&quot; looks to the next setting, SeparateUploadFilePath, to determine where this file should be uploaded. Set this value to &quot;N&quot; to use the same path where the Java Keystore being managed resides. The certificate file uploaded to either location will be removed at the end of the process.
 
