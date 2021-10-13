@@ -82,6 +82,11 @@ namespace JavaKeyStoreSSH
 
                     case AnyJobOperationType.Create:
                         Logger.Debug($"Begin Create Operation for {config.Store.StorePath} on {config.Store.ClientMachine}.");
+                        if (jksStore.DoesStoreExist())
+                        {
+                            Logger.Debug($"Certificate store {config.Store.StorePath} on {config.Store.ClientMachine} already exists.  No action necessary.");
+                            break;
+                        }
                         jksStore.CreateCertificateStore(config.Store.StorePath, config.Store.StorePassword);
                         break; 
                     default:
