@@ -27,7 +27,7 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 
         public JobResult ProcessJob(ManagementJobConfiguration config)
         {
-            ILogger logger = LogHandler.GetClassLogger<Inventory>();
+            ILogger logger = LogHandler.GetClassLogger<Management>();
             logger.LogDebug($"Begin Inventory...");
 
             JKSStore jksStore = new JKSStore(config.CertificateStoreDetails.ClientMachine, config.ServerUsername, config.ServerPassword, config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
@@ -73,6 +73,11 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 
                     case CertStoreOperationType.Create:
                         logger.LogDebug($"Begin Create Operation for {config.CertificateStoreDetails.StorePath} on {config.CertificateStoreDetails.ClientMachine}.");
+                        if (jksStore.DoesStoreExist())
+                        {
+                            logger.LogDebug($"Certificate store {config.CertificateStoreDetails.StorePath} on {config.CertificateStoreDetails.ClientMachine} already exists.  No action necessary.");
+                            break;
+                        }
                         jksStore.CreateCertificateStore(config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
                         break; 
                     default:
