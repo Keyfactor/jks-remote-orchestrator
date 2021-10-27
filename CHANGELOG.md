@@ -1,3 +1,6 @@
+v2.1
+- Modify the Management-Create job to remove the self-signed "New Certificate" seed certificate after it is added during store creation.
+
 v2.0
 - Convert to .Net Core to make compliant with the Keyfactor Universal Orchestrator.  Versions >= 2.x will work with the Keyfactor Universal Orchestrator.  Versions < 2.0 will work with the Keyfactor Windows Orchestrator.
 

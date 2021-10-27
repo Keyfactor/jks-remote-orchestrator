@@ -25,7 +25,7 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 
         public JobResult ProcessJob(DiscoveryJobConfiguration config, SubmitDiscoveryUpdate submitDiscovery)
         {
-            ILogger logger = LogHandler.GetClassLogger<Inventory>();
+            ILogger logger = LogHandler.GetClassLogger<Discovery>();
             logger.LogDebug($"Begin Discovery...");
 
             List<string> locations = new List<string>();
