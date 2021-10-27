@@ -249,6 +249,7 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
             //No option to create a blank store.  Generate a self signed cert with some default and limited validity.
             string keyToolCommand = $"{KeytoolPath}keytool -genkeypair -keystore {storePath} -storepass {storePassword} -dname \"cn=New Certificate Store\" -validity 1 -alias \"NewCertStore\"";
             SSH.RunCommand(keyToolCommand, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, StorePassword == null ? null : new string[] { StorePassword });
+            DeleteCertificateByAlias("NewCertStore");
         }
 
         internal void AddCertificateToStore(string alias, byte[] certBytes, bool overwrite)
