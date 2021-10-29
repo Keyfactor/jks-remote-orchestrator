@@ -28,7 +28,7 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
         public JobResult ProcessJob(ManagementJobConfiguration config)
         {
             ILogger logger = LogHandler.GetClassLogger<Management>();
-            logger.LogDebug($"Begin Inventory...");
+            logger.LogDebug($"Begin Management...");
 
             JKSStore jksStore = new JKSStore(config.CertificateStoreDetails.ClientMachine, config.ServerUsername, config.ServerPassword, config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
             
