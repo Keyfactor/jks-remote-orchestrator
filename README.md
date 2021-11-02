@@ -34,8 +34,14 @@ Versions >= 2.0 are compiled under the .Net Core 3.1 target framework and are co
 ## Security Considerations
 
 **For Linux orchestrated servers:**
-1. The JavaKeystore AnyAgent makes use of the Keytool program and other common Linux commands such as "cp" and "find".  If the credentials you will be connecting with will need elevated access to run these commands, you must set the id up as a sudoer with no password necessary and set the config.json "UseSudo" value to "Y" (See Section 4 regarding the config.json file).
-2. The JavaKeystore AnyAgent makes use of SFTP to transfer files to and from the orchestrated server.  SFTP will not mske use of sudo, so all folders containing certificate stores will need to allow SFTP file transfer.  If this is not possible, set the values in the config.json apprpriately to use an alternative upload/download folder that does have SFTP file transfer (See Section 4 regarding the config.json file).
+1. The JavaKeystore AnyAgent makes use of the Keytool program and other common Linux commands.  If the credentials you will be connecting with will need elevated access to run these commands, you must set the id up as a sudoer with no password necessary and set the config.json "UseSudo" value to "Y" (See Section 4 regarding the config.json file).  The full list of these commands below:
+    * keytool
+    * rm
+    * ls
+    * find
+    * dos2unix (only if running pre-run script - see "4. Update Settings in config.json")
+    * chmod (only if running pre-run script - see "4. Update Settings in config.json")
+2. The JavaKeystore AnyAgent makes use of SFTP to transfer files to and from the orchestrated server.  SFTP will not make use of sudo, so all folders containing certificate stores will need to allow SFTP file transfer.  If this is not possible, set the values in the config.json apprpriately to use an alternative upload/download folder that does have SFTP file transfer (See Section 4 regarding the config.json file).
 3. To manage Java keystores, Java itself must be installed on the orchestrated server.  Wtih Java comes the Keytool program.  The path where Java and Keytool reside must be in the $PATH system environment variable on the orchestrated server.  If this is not possible, please review Section 4 regarding the config.json file to find information on setting up a client-written bash script to find the path where Keytool resides.
 
 **For Windows orchestrated servers:**
