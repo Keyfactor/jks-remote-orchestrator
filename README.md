@@ -104,7 +104,7 @@ First, in Keyfactor Command navigate to Certificate Locations =\> Certificate St
 
 - **Category** – Required. The Java Keystore type name must be selected.
 - **Orchestrator** – Select the orchestrator you wish to use to manage this store
-- Client Machine & Credentials** – Required. The server name or IP Address and login credentials for the server where the Certificate Store is located.  The credentials for server login can be any of:
+- **Client Machine & Credentials** – Required. The server name or IP Address and login credentials for the server where the Certificate Store is located.  The credentials for server login can be any of:
 
   - UserId/Password
 
