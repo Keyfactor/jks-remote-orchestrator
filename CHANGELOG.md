@@ -1,3 +1,7 @@
+v2.2
+- Add support for SCP protocol when uploading certificate files
+- Fix bug when creating certificate store on windows servers
+
 v2.1
 - Modify the Management-Create job to remove the self-signed "New Certificate" seed certificate after it is added during store creation.
 
