@@ -151,11 +151,23 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.RemoteHandlers
         {
             _logger.LogDebug($"DoesStoreExist: {path} {fileName}");
 
-            string NOT_EXISTS = "file not found";
-            string result = RunCommand($"dir {path}{fileName}", null, false, null);
+            string result = string.Empty;
 
-            return !result.ToLower().Contains(NOT_EXISTS);
+            try
+            {
+                result = RunCommand($"dir '{path}{fileName}'", null, false, null);
+            }
+            catch (ApplicationException ex)
+            {
+                if (ex.Message.ToLower().Contains("does not exist"))
+                    return false;
+                else
+                    throw ex;
+            }
+
+            return !result.ToLower().Contains("file not found");
         }
+
 
         private string FormatResult(ICollection<PSObject> results)
         {
