@@ -143,9 +143,11 @@ As a configuration step, you must modify the config.json file, found in the plug
 
 "SeparateUploadFilePath": "/path/to/upload/folder/",
 
-"FindKeytoolPathOnWindows": "N"
+"FindKeytoolPathOnWindows": "N",
 
-"UseNegotiateAuth": "N"
+"UseNegotiateAuth": "N",
+
+"UseSCP": "N"
 
 }
 
@@ -167,6 +169,7 @@ Modify the six values as appropriate (all must be present regardless of Linux or
 
 **UseNegotiateAuth** (Windows only) – Y/N - Determines if WinRM should use Negotiate (Y) when connecting to the remote server.
 
+**UseSCP** (Optional, Linux only) - Y/N - Detemines if SCP (Y) or SFTP (N or ) should be used in uploading certificate files during Management-Add jobs
 
 Json format that MUST be returned by script identified in **PreRunScript** if **UsePrerunScript** is set to "Y":
 
