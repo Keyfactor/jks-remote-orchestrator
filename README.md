@@ -1,7 +1,7 @@
 # Remote JKS
 ## orchestrator
 
-The remote JKS Orchestrator allows for the remote management of Java Key Stores. Discovery, Inventory, and Management functions are supported. The orchestrator performs operations by issuing remote commands over SSH to Linux based systems and WinRM to Windows based systems.
+The remote JKS Orchestrator Extension allows for the remote management of Java Key Stores. Discovery, Inventory, and Management functions are supported. The orchestrator extension performs operations by issuing remote commands over SSH to Linux based systems and WinRM to Windows based systems.  Currently this extension is only intended for use with the Keyfactor Universal Orchestrator installed on a Windows server.
 
 <!-- add integration specific information below -->
 
