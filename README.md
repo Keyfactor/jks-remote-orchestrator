@@ -14,11 +14,6 @@ The Universal Orchestrator is the successor to the Windows Orchestrator. This Ca
 
 ---
 
-# Remote JKS
-## orchestrator
-
-The remote JKS Orchestrator allows for the remote management of Java Key Stores. Discovery, Inventory, and Management functions are supported. The orchestrator performs operations by issuing remote commands over SSH to Linux based systems and WinRM to Windows based systems.
-
 <!-- add integration specific information below -->
 
 Note that as a prerequisite for using the Remote JKS to manage/orchestrate a Linux or Windows server is that Java be installed on each server being managed/orchestrated.
