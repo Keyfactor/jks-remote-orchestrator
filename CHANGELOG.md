@@ -1,3 +1,6 @@
+v2.3
+- Limit the valid characters that can be used for store paths to protect against command injection.
+
 v2.2
 - Add support for SCP protocol when uploading certificate files
 - Fix bug when creating certificate store on windows servers
