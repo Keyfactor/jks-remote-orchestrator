@@ -89,7 +89,7 @@ If you choose to manually create a Java Keystore store In Keyfactor Command rath
   
   When setting up a Windows server, the format of the machine name must be – [http://_ServerName_:5985](http://ServerName:5985/), where "5985" is the WinRM port number. 5985 is the standard, but if your organization uses a different, use that.  The credentials used will be the Keyfactor Command service account.  Because of this, for Windows orchestrated servers, setting an additional set of credentials is not necessary.  **However, it is required that the *Change Credentials* link still be clicked on and the resulting dialog closed by clicking OK.**
   
-- **Store Path** – Required. The FULL PATH and file name of the Java Keystore being managed. File paths on Linux servers will always begin with a "/". Windows servers will always begin with the drive letter, colon, and backslash, such as "c:\\".
+- **Store Path** – Required. The FULL PATH and file name of the Java Keystore being managed. File paths on Linux servers will always begin with a "/". Windows servers will always begin with the drive letter, colon, and backslash, such as "c:\\".  Valid characters for Linux store paths include any alphanumeric character, space, forward slash, hyphen, underscore, and period. For Windows servers, the aforementioned characters as well as a colon and backslash.
 - **Orchestrator** – Select the orchestrator you wish to use to manage this store
 - **Store Password** – Set the store password for the Java Keystore
 - **Inventory Schedule** – Set a schedule for running Inventory jobs or none, if you choose not to schedule Inventory at this time.
