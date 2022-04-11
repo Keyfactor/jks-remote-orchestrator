@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Newtonsoft.Json;
 
@@ -58,6 +59,12 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
             StorePassword = storePassword;
             ServerType = StorePath.Substring(0, 1) == "/" ? ServerTypeEnum.Linux : ServerTypeEnum.Windows;
             UploadFilePath = ApplicationSettings.UseSeparateUploadFilePath && ServerType == ServerTypeEnum.Linux ? ApplicationSettings.SeparateUploadFilePath : StorePath;
+
+            if (!IsStorePathValid())
+            {
+                string partialMessage = ServerType == ServerTypeEnum.Windows ? @"'\', ':', " : string.Empty;
+                throw new JKSException($"Java Keystore {storeFileAndPath} is invalid.  Only alphanumeric, '.', '/', {partialMessage}'-', and '_' characters are allowed in the store path.");
+            }
         }
 
         internal JKSStore(string server, string serverId, string serverPassword, ServerTypeEnum serverType)
@@ -263,6 +270,12 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
             string keyToolCommand = $"{KeytoolPath}keytool -importkeystore -srckeystore '{UploadFilePath}{FILE_NAME_REPL}.p12' -srcstoretype PKCS12 -srcstorepass '{pfxPassword}' -srcalias '{sourceAlias}' " +
                 $"-destkeystore '{StorePath + StoreFileName}' -destalias '{destAlias}' -deststoretype JKS -destkeypass '{(string.IsNullOrEmpty(entryPassword) ? StorePassword : entryPassword)}' -deststorepass '{StorePassword}' -noprompt";
             AddEntry(keyToolCommand, destAlias, certBytes, pfxPassword, overwrite);
+        }
+
+        internal bool IsStorePathValid()
+        {
+            Regex regex = new Regex(ServerType == ServerTypeEnum.Linux ? $@"^[\d\s\w-_/.]*$" : $@"^[\d\s\w-_/.:\\\\]*$");
+            return regex.IsMatch(StorePath + StoreFileName);
         }
 
         private bool IsKeytoolInstalled()
