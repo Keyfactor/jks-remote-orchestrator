@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.Net;
 using System.Text;
 
 using Microsoft.Extensions.Logging;
@@ -22,17 +23,22 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.RemoteHandlers
         private const string IGNORED_ERROR3 = "certificate was added to keystore";
 
         private Runspace runspace { get; set; }
+        private WSManConnectionInfo connectionInfo { get; set; }
 
-        internal WinRMHandler(string server)
+        internal WinRMHandler(string server, string serverLogin, string serverPassword)
         {
             Server = server;
+            connectionInfo = new WSManConnectionInfo(new System.Uri($"{Server}/wsman"));
+            if (!string.IsNullOrEmpty(serverLogin))
+            {
+                connectionInfo.Credential = new PSCredential(serverLogin, new NetworkCredential(serverLogin, serverPassword).SecurePassword);
+            }
         }
 
         public override void Initialize()
         {
             try
             {
-                WSManConnectionInfo connectionInfo = new WSManConnectionInfo(new System.Uri($"{Server}/wsman"));
                 if (ApplicationSettings.UseNegotiateAuth)
                 {
                     connectionInfo.AuthenticationMechanism = AuthenticationMechanism.Negotiate;
