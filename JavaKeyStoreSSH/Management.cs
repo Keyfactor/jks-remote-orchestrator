@@ -78,7 +78,13 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
                             logger.LogDebug($"Certificate store {config.CertificateStoreDetails.StorePath} on {config.CertificateStoreDetails.ClientMachine} already exists.  No action necessary.");
                             break;
                         }
-                        jksStore.CreateCertificateStore(config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword);
+
+                        dynamic properties = JsonConvert.DeserializeObject(config.CertificateStoreDetails.Properties.ToString());
+                        string linuxFilePermissions = properties.linuxFilePermissionsOnStoreCreation == null || string.IsNullOrEmpty(properties.linuxFilePermissionsOnStoreCreation.Value) ?
+                            ApplicationSettings.DefaultLinuxPermissionsOnStoreCreation :
+                            properties.linuxFilePermissionsOnStoreCreation.Value;
+
+                        jksStore.CreateCertificateStore(config.CertificateStoreDetails.StorePath, config.CertificateStoreDetails.StorePassword, linuxFilePermissions);
                         break; 
                     default:
                         return new JobResult() { Result = OrchestratorJobStatusJobResult.Failure, JobHistoryId = config.JobHistoryId, FailureMessage = $"Site {config.CertificateStoreDetails.StorePath} on server {config.CertificateStoreDetails.ClientMachine}: Unsupported operation: {config.OperationType.ToString()}" };

@@ -6,5 +6,6 @@
   "UseSeparateUploadFilePath": "N",
   "SeparateUploadFilePath": "/path/to/upload/folder/",
   "FindKeytoolPathOnWindows": "N",
-  "UseNegotiateAuth":  "N"
+  "UseNegotiateAuth": "N",
+  "DefaultLinuxPermissionsOnStoreCreation": "600"
 }
