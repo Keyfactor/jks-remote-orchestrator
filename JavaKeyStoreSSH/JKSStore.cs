@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Newtonsoft.Json;
 
@@ -19,6 +20,7 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
 {
     internal class JKSStore
     {
+        private const string LINUX_PERMISSION_REGEXP = "^[0-7]{3}$";
         private const string NO_EXTENSION = "noext";
         private const string FULL_SCAN = "fullscan";
 
@@ -58,6 +60,12 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
             StorePassword = storePassword;
             ServerType = StorePath.Substring(0, 1) == "/" ? ServerTypeEnum.Linux : ServerTypeEnum.Windows;
             UploadFilePath = ApplicationSettings.UseSeparateUploadFilePath && ServerType == ServerTypeEnum.Linux ? ApplicationSettings.SeparateUploadFilePath : StorePath;
+
+            if (!IsStorePathValid())
+            {
+                string partialMessage = ServerType == ServerTypeEnum.Windows ? @"'\', ':', " : string.Empty;
+                throw new JKSException($"Java Keystore {storeFileAndPath} is invalid.  Only alphanumeric, '.', '/', {partialMessage}'-', and '_' characters are allowed in the store path.");
+            }
         }
 
         internal JKSStore(string server, string serverId, string serverPassword, ServerTypeEnum serverType)
@@ -74,7 +82,7 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
                 SSH = new SSHHandler(Server, ServerId, ServerPassword);
                 //SSH = new SSHHandler(Server, ServerId, PamUtility.ResolvePassword(ServerPassword));
             else
-                SSH = new WinRMHandler(Server);
+                SSH = new WinRMHandler(Server, ServerId, ServerPassword);
 
             try
             {
@@ -244,12 +252,17 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
             }
         }
 
-        internal void CreateCertificateStore(string storePath, string storePassword)
+        internal void CreateCertificateStore(string storePath, string storePassword, string linuxFilePermissions)
         {
             //No option to create a blank store.  Generate a self signed cert with some default and limited validity.
+            AreLinuxPermissionsValid(linuxFilePermissions);
+
             string keyToolCommand = $"{KeytoolPath}keytool -genkeypair -keystore {storePath} -storepass '{storePassword}' -dname \"cn=New Certificate Store\" -validity 1 -alias \"NewCertStore\"";
             SSH.RunCommand(keyToolCommand, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, StorePassword == null ? null : new string[] { StorePassword });
             DeleteCertificateByAlias("NewCertStore");
+
+            if (ServerType == ServerTypeEnum.Linux)
+                SSH.RunCommand($"chmod {linuxFilePermissions} {storePath}", null, ApplicationSettings.UseSudo, null);
         }
 
         internal void AddCertificateToStore(string alias, byte[] certBytes, bool overwrite)
@@ -265,11 +278,24 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
             AddEntry(keyToolCommand, destAlias, certBytes, pfxPassword, overwrite);
         }
 
+        internal bool IsStorePathValid()
+        {
+            Regex regex = new Regex(ServerType == ServerTypeEnum.Linux ? $@"^[\d\s\w-_/.]*$" : $@"^[\d\s\w-_/.:\\\\]*$");
+            return regex.IsMatch(StorePath + StoreFileName);
+        }
+
         private bool IsKeytoolInstalled()
         {
             string keyToolCommand = ServerType == ServerTypeEnum.Linux ? $"which keytool" : "java -version 2>&1";
             string result = SSH.RunCommand(keyToolCommand, null, ServerType == ServerTypeEnum.Linux && ApplicationSettings.UseSudo, null);
             return !(string.IsNullOrEmpty(result));
+        }
+
+        private static void AreLinuxPermissionsValid(string permissions)
+        {
+            Regex regex = new Regex(LINUX_PERMISSION_REGEXP);
+            if (!regex.IsMatch(permissions))
+                throw new JKSException($"Invalid format for Linux file permissions.  This value must be exactly 3 digits long with each digit between 0-7 but found {permissions} instead.");
         }
 
         private List<string> FindStoresLinux(string[] paths, string[] extensions, string[] fileNames)
