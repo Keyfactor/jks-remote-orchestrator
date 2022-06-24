@@ -32,10 +32,10 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH
             string configContents = string.Empty;
             string currDir = Path.GetDirectoryName(currLocation);
 
-            if (!File.Exists($@"{currDir}\config.json"))
+            if (!File.Exists($@"{currDir}{Path.DirectorySeparatorChar}config.json"))
                 throw new JKSException($"config.json file does not exist in {currDir}");
 
-            using (StreamReader sr = new StreamReader($@"{currDir}\config.json"))
+            using (StreamReader sr = new StreamReader($@"{currDir}{Path.DirectorySeparatorChar}config.json"))
             {
                 configContents = sr.ReadToEnd();
             }
