@@ -1,5 +1,6 @@
 v2.5
 - Bug fixes for installation on Linux hosted Universal Orchestrator
+- Bug fix for handling embedded double quotes in alias on Windows servers (2.5.1)
 
 v2.4
 - Add new config.json setting DefaultLinuxPermissionsOnStoreCreation, and certificate store type custom parameter linuxFilePermissionsOnStoreCreation
