@@ -73,7 +73,7 @@ namespace Keyfactor.Extensions.Orchestrator.JavaKeyStoreSSH.RemoteHandlers
 
                     if (commandText.ToLower().IndexOf("keytool ") > -1)
                     {
-                        commandText = ($"& '{commandText}").Replace("keytool", "keytool'");
+                        commandText = ($"& '{commandText}").Replace("keytool", "keytool'").Replace(@"""",@"\""");
                         commandText = "echo '' | " + commandText;
                     }
                     ps.AddScript(commandText);
