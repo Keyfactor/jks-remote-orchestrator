@@ -1,6 +1,6 @@
 # Remote JKS
 
-**PLEASE NOTE:** This integration has been decprecated and replaced by The RemoteFile Orchestrator Extension - https://github.com/Keyfactor/remote-file-orchestrator. <br><br> The remote JKS Orchestrator Extension allows for the remote management of Java Key Stores. Discovery, Inventory, and Management functions are supported. The orchestrator extension performs operations by issuing remote commands over SSH to Linux based systems and WinRM to Windows based systems.
+**PLEASE NOTE:** This integration has been deprecated and replaced by The RemoteFile Orchestrator Extension - https://github.com/Keyfactor/remote-file-orchestrator. <br><br> The remote JKS Orchestrator Extension allows for the remote management of Java Key Stores. Discovery, Inventory, and Management functions are supported. The orchestrator extension performs operations by issuing remote commands over SSH to Linux based systems and WinRM to Windows based systems.
 
 #### Integration status: Production - Ready for use in production environments.
 
